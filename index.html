@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e16">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Contas">
 <title>Painel de Contas</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -782,7 +787,7 @@
         </div>
       </div>
 
-      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 5.1 · agosto/2026</div>
+      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 5.3 · agosto/2026</div>
     </div>
     </sc-if>
   </div>
@@ -1935,23 +1940,18 @@ class Component extends DCLogic {
         nome: x[0], sel: () => this.setState({ impModo: x[1] }),
         bg: s.impModo === x[1] ? this.accent : 'transparent', cor: s.impModo === x[1] ? '#08121f' : '#9fb0c9'
       })),
-      impTitulo: impPlanilha ? 'Solte a planilha aqui' : 'Solte o extrato do banco',
-      impSub: impPlanilha ? 'Excel ou CSV com título, valor e vencimento. Eu identifico as colunas sozinho.' : 'OFX, CSV ou PDF do banco. Confiro os pagamentos com as contas já registradas.',
-      impPreviaTitulo: impPlanilha ? 'Prévia · 4 contas encontradas' : 'Prévia · 4 pagamentos conferidos',
+      impTitulo: impPlanilha ? 'Restaurar backup (.json)' : 'Conferir por extrato',
+      impSub: impPlanilha ? 'Toque em Escolher arquivo e selecione seu backup .json — restaura todas as contas de uma vez.' : 'Extrato do banco (planilha/PDF): me envie pelo chat que eu devolvo pronto pra importar aqui.',
+      impPreviaTitulo: 'Como funciona',
       impLinhas: impPlanilha ? [
-        { titulo: 'Aluguel do estúdio', info: '05/08 · Boleto · Empresa', valor: 'R$ 2.600,00', status: 'JÁ EXISTE', statusCor: '#fbbf24', bd: 'rgba(245,158,11,.4)' },
-        { titulo: 'Gás Ultragaz', info: '12/08 · Pix · Casa', valor: 'R$ 145,00', status: 'NOVA', statusCor: '#4ade80', bd: '#1f2937' },
-        { titulo: 'Google Workspace', info: '15/08 · Cartão · Empresa', valor: 'R$ 69,90', status: 'NOVA', statusCor: '#4ade80', bd: '#1f2937' },
-        { titulo: 'Seguro do carro', info: '16/08 · Cartão · Pessoal', valor: 'R$ 289,90', status: 'DUPLICADA', statusCor: '#f87171', bd: 'rgba(239,68,68,.4)' }
+        { titulo: 'Backup .json', info: 'O arquivo que você baixou em "Baixar no celular"', valor: '', status: 'AQUI', statusCor: '#4ade80', bd: 'rgba(34,197,94,.35)' },
+        { titulo: 'Planilha Excel/CSV', info: 'Me envie no chat que eu converto pro formato certo', valor: '', status: 'CHAT', statusCor: '#93c5fd', bd: '#1f2937' }
       ] : [
-        { titulo: 'Aluguel de casa', info: '05/08 · Pix enviado · Itaú', valor: 'R$ 1.850,00', status: 'CONFERE', statusCor: '#4ade80', bd: 'rgba(34,197,94,.35)' },
-        { titulo: 'Plano de saúde Unimed', info: '07/08 · Débito · Bradesco', valor: 'R$ 812,90', status: 'CONFERE', statusCor: '#4ade80', bd: 'rgba(34,197,94,.35)' },
-        { titulo: 'Internet Vivo Fibra', info: '08/08 · Débito · Itaú', valor: 'R$ 129,90', status: 'CONFERE', statusCor: '#4ade80', bd: 'rgba(34,197,94,.35)' },
-        { titulo: 'Farmácia São João', info: '09/08 · Cartão · sem conta registrada', valor: 'R$ 87,40', status: 'SEM PAR', statusCor: '#fbbf24', bd: 'rgba(245,158,11,.4)' }
+        { titulo: 'Extrato do banco', info: 'Me envie no chat (PDF/CSV) que eu confiro os pagamentos', valor: '', status: 'CHAT', statusCor: '#93c5fd', bd: '#1f2937' }
       ],
-      impBotao: impPlanilha ? 'Importar 2 contas novas' : 'Marcar 3 contas como pagas',
-      escolherArquivo: () => this.aviso('Envie o arquivo pelo chat que eu preparo a planilha pronta'),
-      confirmarImp: () => { this.setState({ overlay: null }); this.aviso('Importação por arquivo: em breve'); },
+      impBotao: 'Escolher arquivo .json',
+      escolherArquivo: () => { this.setState({ overlay: null }); this._importarBackup(); },
+      confirmarImp: () => { this.setState({ overlay: null }); this._importarBackup(); },
 
       temToast: !!s.toast, toast: s.toast
     };
@@ -1961,6 +1961,66 @@ class Component extends DCLogic {
 </script>
 <script>
 (function(){const t=document.getElementById('tpl').innerHTML;const te=window.TemplateEngine.compile(t);const a=new Component();a.mount(document.getElementById('app'),te);window.__app=a;})();
+</script>
+
+<script>
+(function(){
+  try {
+    if (typeof URL === 'undefined' || !URL.createObjectURL) return; // ambiente sem suporte
+    var ICON192 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAE2UlEQVR4nO3cv1LUXBjH8bNMGgcL0aFynbHyD1u4paPWXArbygVYeQHQyqVQK1pCITNa03EBlmsRWIGFJeaX8zx5Tr6foXxnkpzzfU+STeLoyfO3CWirms/n3vuAwNa8dwCxERAkBAQJAUFSpcRFNNpjBYKEgCAhIEgICJKKa2gouAuDhFMYJAQECQFBQkCQcBENCSsQJAQECQFBQkCQVLxTDwV3YZBwCoOEgCAhIEgICBICgoS7MEhYgSAhIEgICBK+yoCEi2hIOIVBQkCQEBAkBARJ5b0D12ztfPPehRhOD95778KF0cZ46r0PKaW0tXPkvQvxnB68896FHgREOiLfjDwDIp0OeWU0evR06rLhyYx6Ovbzi0NDPndh1JODy6g6BEQ9+diP7VpKc8s/6sltMjuynFB+SITENKDJ7Lvl5gbLcpxZgSCxC4jlx5LZaPNCWcEsZtZoBZrMfthsCAs2Y841ECS8VF+0/JPLCgQJAUHCXVjZsk8uKxAkBAQJAUFCQJAQECTchZUt++T268PChr5+euC9C1l8+PzHexf+29p8ngz+OlRqPSnDoRnMbLBroILrqYU7wEgBhRvcdmIdptlXGapYwyrq7mD5KgP9RkCQEBAkBARJmIAi/sjWWqCDDXMXlkINq6LTwzS4CwvTT0oDaKjjA8w/s2FOYQsFNxTx0EI+TI040KWKtwKhVwgIEl4oK1v2yWUFgoSAICEgSELexpf6blDEnyciPcqolVpPynJo2Wc22Ev1BddT6/YAean+muLrqcU6zDABxRpWUaCDDRMQ+omAIOFRRtl4lIF+CxNQxB/ZWgt0sGECSqGGVRHrMCMFlKINbgvhDjBYQCngEDcX8dCqjv/1HhMRB9pH/smNtwKhVwgIEgKChIAg4VFG2biIRr8RECS8VH8PfnNaLd4KZPy2XqCXA13wUn1PN9oJm5fqw3zW4ziRYRvK/1mP9xE25T6F7jvQT2ECQj8RECQEBAmPMsrGo4xL7j/oue9AP4UJKLlOIfXcJVJAyWkiqWeFYAEl8+mkntWqiNfQTGpT+Sc30qMM0eF403sX7PEooyN1PYfjzUFmlNEgAroRDRl1aBABLds+O/fehUKUH9DyYkM9HSo8IE5VuZX8LOzWega2/PAsrJmGK83A6rEQPqDFLdXyrdaN/5J6cgj5WU9txapDPWaCfZVx1XITty5FQ2Yws6VdRHPhfB0X0Ss1KWPA9ViIHVC6rw/qyS18QIlKXJUQ0F0Iy0AhAdWtbJ+d13+JeqyUcxd2tRjqucRdGPqNgCAJ+VI9mjJ5qR5ozyigk/3XNhvCgs2Yl3MXhiUWM2t3CjvZf2W2LZiNNtdAkJgGxCJkw3KcWYEgGT18/Mx4k28+/jLe4qCc7L+03JzDCmR8hINiP7Y+pzAaysFlVEfrG9ansIXpLueyzhzv+fw/6RlQjYxEXunU/AOqkVELvunURusbY+99+Ge6+9t7F2I43nvhvQsX+hUQwuGHREgICBICgoSAIOGFMkhYgSDhqwxIWIEgISBIuIiGhBUIEgKChIAgISBICAgS7sIgqTL9M/IYCE5hkBAQJAQECQFBwl0YJKxAkBAQJAQECQFBwkU0JLxUDwmnMEgICBICgoSAIOEuDBJWIEgICBICgoSAIPkLCHz8wkJRlM0AAAAASUVORK5CYII=";
+    var ICON512 = "data:image/png;base64,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";
+    var manifest = {"name": "Painel de Contas", "short_name": "Contas", "description": "Controle de pagamentos — nunca esqueça uma conta", "start_url": ".", "scope": ".", "display": "standalone", "orientation": "portrait", "background_color": "#0a0e16", "theme_color": "#0a0e16", "icons": [{"src": "__I192__", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"}, {"src": "__I512__", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]};
+    manifest.icons[0].src = ICON192;
+    manifest.icons[1].src = ICON512;
+    var mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    var mlink = document.createElement('link');
+    mlink.rel = 'manifest'; mlink.href = URL.createObjectURL(mblob);
+    document.head.appendChild(mlink);
+    var al = document.createElement('link');
+    al.rel = 'apple-touch-icon'; al.href = ICON192;
+    document.head.appendChild(al);
+
+    if ('serviceWorker' in navigator) {
+      var swCode = [
+        "var CACHE='painel-contas-v51';",
+        "self.addEventListener('install',function(e){self.skipWaiting();});",
+        "self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim());});",
+        "self.addEventListener('fetch',function(e){",
+        "  if(e.request.method!=='GET')return;",
+        "  e.respondWith(caches.open(CACHE).then(function(c){",
+        "    return c.match(e.request).then(function(hit){",
+        "      var net=fetch(e.request).then(function(r){try{c.put(e.request,r.clone());}catch(_){}return r;}).catch(function(){return hit;});",
+        "      return hit||net;",
+        "    });",
+        "  }));",
+        "});"
+      ].join('\n');
+      var sblob = new Blob([swCode], {type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(sblob)).catch(function(){});
+    }
+
+    var deferred = null;
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault(); deferred = e; mostrarBotao();
+    });
+    function mostrarBotao(){
+      if (document.getElementById('btn-instalar')) return;
+      var b = document.createElement('button');
+      b.id = 'btn-instalar';
+      b.textContent = '\u2193 Instalar app';
+      b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:9999;background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#06121f;border:none;border-radius:999px;padding:13px 22px;font-size:14px;font-weight:800;box-shadow:0 12px 30px rgba(59,130,246,.5);cursor:pointer;font-family:inherit';
+      b.onclick = function(){
+        if(!deferred)return;
+        deferred.prompt();
+        deferred.userChoice.then(function(){ deferred=null; b.remove(); });
+      };
+      document.body.appendChild(b);
+    }
+    window.addEventListener('appinstalled', function(){
+      var b=document.getElementById('btn-instalar'); if(b)b.remove();
+    });
+  } catch(err) { /* nunca deixa o PWA quebrar o app */ }
+})();
 </script>
 </body>
 </html>
