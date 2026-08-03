@@ -770,9 +770,9 @@
               <span style="flex:1;font-size:14px;font-weight:700">Baixar no celular</span>
               <span style="font-size:12px;color:#8b97ad">.json</span>
             </button>
-            <button sc-camel-on-click="{{ abrirImportar }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#0f1725;border:1px solid #1f2937;border-radius:16px;padding:14px;color:#e8edf7;cursor:pointer" style-hover="background:#18202f">
+            <button sc-camel-on-click="{{ backupResgatar }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#0f1725;border:1px solid #1f2937;border-radius:16px;padding:14px;color:#e8edf7;cursor:pointer" style-hover="background:#18202f">
               <svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"><path d="M12 20V9"></path><path d="m7 14 5-5 5 5"></path><path d="M5 4h14"></path></svg>
-              <span style="flex:1;font-size:14px;font-weight:700">Importar arquivo</span>
+              <span style="flex:1;font-size:14px;font-weight:700">Importar backup (.json)</span>
             </button>
             <button sc-camel-on-click="{{ backupResgatar }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#0f1725;border:1px solid #1f2937;border-radius:16px;padding:14px;color:#e8edf7;cursor:pointer" style-hover="background:#18202f">
               <svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
@@ -782,7 +782,7 @@
         </div>
       </div>
 
-      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 5.0 · agosto/2026</div>
+      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 5.1 · agosto/2026</div>
     </div>
     </sc-if>
   </div>
@@ -1619,15 +1619,16 @@ class Component extends DCLogic {
       reader.onload = () => {
         try {
           const dados = JSON.parse(reader.result);
-          const patch = {};
-          if (Array.isArray(dados.contas)) patch.contas = dados.contas;
+          const contas = this._converterContas(dados);
+          if (!contas || !contas.length) { this.aviso('Nenhuma conta encontrada no arquivo'); return; }
+          const patch = { contas: contas };
+          // categorias: aceita formato novo (cats objeto) ou antigo (categorias lista)
           if (dados.cats) patch.cats = dados.cats;
           if (dados.aviso != null) patch.aviso = dados.aviso;
           if (dados.hora) patch.hora = dados.hora;
           if (dados.tg) patch.tg = dados.tg;
-          if (!patch.contas) { this.aviso('Arquivo não reconhecido'); return; }
           this.setState(patch);
-          this.aviso('Dados restaurados ✓ (' + patch.contas.length + ' contas)');
+          this.aviso(contas.length + ' contas restauradas ✓');
         } catch (err) {
           this.aviso('Erro ao ler o arquivo');
         }
@@ -1635,6 +1636,57 @@ class Component extends DCLogic {
       reader.readAsText(file);
     };
     inp.click();
+  }
+  // Converte contas de qualquer formato (novo OU antigo) pro formato do app.
+  _converterContas(dados) {
+    const lista = Array.isArray(dados) ? dados : (dados.contas || []);
+    return lista.map((c, i) => {
+      // formato novo já tem venc/cat/tipo; antigo tem vencimento/categoriaId/descricao
+      const venc = c.venc || c.vencimento || '';
+      const cat = c.cat || c.categoriaId || 'pessoal';
+      // tipo: se não tiver, deduz — recorrente vira fixa, senão eventual
+      let tipo = c.tipo;
+      if (!tipo) tipo = c.recorrente ? 'fixa' : 'eventual';
+      // categoria válida (só pessoal/casa/empresa no topo); sobe a cadeia de pais até a raiz
+      let catRaiz = this._raizCategoria(cat, dados.categorias || []);
+      return {
+        id: c.id ? String(c.id) : ('imp' + Date.now() + i),
+        titulo: (c.titulo || '').trim() || 'Sem título',
+        desc: (c.desc || c.descricao || '').trim(),
+        valor: Number(c.valor) || 0,
+        venc: venc,
+        cat: catRaiz,
+        tipo: tipo,
+        forma: c.forma || (c.formaPagamento ? this._formaLabel(c.formaPagamento) : 'Pix'),
+        banco: c.banco || '',
+        cartao: c.cartao || c.cartaoFinal || '',
+        prio: c.prio || (c.prioridade === 'alta' || c.prioridade === 'urgente' || c.prioridade === 'emergencia' ? 1 : c.prioridade === 'baixa' ? 3 : 2),
+        rec: c.rec != null ? c.rec : !!c.recorrente,
+        pago: !!c.pago,
+      };
+    });
+  }
+  // Sobe a cadeia de categoria-pai até achar pessoal/casa/empresa.
+  _raizCategoria(cat, categorias) {
+    const raizes = { pessoal: 1, casa: 1, empresa: 1 };
+    let atual = cat;
+    for (let i = 0; i < 10; i++) {
+      if (raizes[atual]) return atual;
+      const def = categorias.find((x) => x.id === atual);
+      if (!def) break;
+      // reconhece pelo nome
+      const nome = (def.nome || '').toLowerCase().trim();
+      if (nome.indexOf('casa') >= 0) return 'casa';
+      if (nome.indexOf('empresa') >= 0 || nome.indexOf('estúdio') >= 0 || nome.indexOf('estudio') >= 0) return 'empresa';
+      if (nome === 'pessoal') return 'pessoal';
+      if (!def.paiId) break;
+      atual = def.paiId;
+    }
+    return raizes[atual] ? atual : 'pessoal';
+  }
+  _formaLabel(f) {
+    const m = { pix: 'Pix', boleto: 'Boleto', credito: 'Cartão', debito: 'Débito automático', dinheiro: 'Dinheiro', carteira: 'Dinheiro' };
+    return m[f] || 'Pix';
   }
   _saudacao() {
     const h = new Date().getHours();
@@ -1908,13 +1960,7 @@ class Component extends DCLogic {
 
 </script>
 <script>
-(function () {
-  const tplHtml = document.getElementById('tpl').innerHTML;
-  const templateEl = window.TemplateEngine.compile(tplHtml);
-  const app = new Component();
-  app.mount(document.getElementById('app'), templateEl);
-  window.__app = app;
-})();
+(function(){const t=document.getElementById('tpl').innerHTML;const te=window.TemplateEngine.compile(t);const a=new Component();a.mount(document.getElementById('app'),te);window.__app=a;})();
 </script>
 </body>
 </html>
