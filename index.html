@@ -315,7 +315,6 @@
           <div style="font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:#8b97ad">{{ dataHoje }}</div>
           <div style="font-size:clamp(24px,4.4vw,32px);font-weight:800;letter-spacing:-.02em;margin-top:6px">{{ saudacao }}</div>
         </div>
-        <div style="width:44px;height:44px;border-radius:14px;background:#131926;border:1px solid #1f2937;display:grid;place-items:center;font-weight:800;color:#f59e0b;flex:none">R</div>
       </div>
 
       <sc-if value="{{ temAlerta }}" hint-placeholder-val="{{ false }}">
@@ -331,8 +330,11 @@
         </div>
       </sc-if>
 
-      <div style="background:linear-gradient(150deg,#16243d 0%,#131926 55%);border:1px solid #24344f;border-radius:24px;padding:clamp(20px,3.4vw,28px);margin-bottom:14px">
-        <div style="font-size:14px;font-weight:600;color:#9fb0c9">Falta pagar em agosto</div>
+      <div sc-camel-on-click="{{ toggleEscopo }}" style="background:linear-gradient(150deg,#16243d 0%,#131926 55%);border:1px solid #24344f;border-radius:24px;padding:clamp(20px,3.4vw,28px);margin-bottom:14px;cursor:pointer">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="font-size:14px;font-weight:600;color:#9fb0c9">Falta pagar · {{ escopoNome }}</div>
+          <span style="font-size:12px;color:#60a5fa;font-weight:700">{{ escopoSeta }} trocar</span>
+        </div>
         <div style="display:flex;align-items:baseline;gap:10px;margin:8px 0 4px">
           <span style="font-size:clamp(36px,7vw,54px);font-weight:800;letter-spacing:-.035em;line-height:1">{{ faltaPagar }}</span>
         </div>
@@ -346,15 +348,23 @@
         </div>
       </div>
 
+      <sc-if value="{{ escopoAberto }}">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <sc-for list="{{ escopos }}" as="e">
+          <button sc-camel-on-click="{{ e.sel }}" style="flex:1;min-width:calc(50% - 4px);background:{{ e.bg }};color:{{ e.cor }};border:1px solid {{ e.bd }};border-radius:13px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer">{{ e.nome }}</button>
+        </sc-for>
+      </div>
+      </sc-if>
+
       <div style="font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b97ad;margin:22px 0 10px">Custo do mês · estrutural</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-        <div style="background:#131926;border:1px solid #1f2937;border-left:3px solid #3b82f6;border-radius:18px;padding:16px 18px">
-          <div style="font-size:13px;font-weight:700;color:#93c5fd">Fixas</div>
+        <div sc-camel-on-click="{{ verFixas }}" style="background:#131926;border:1px solid #1f2937;border-left:3px solid #3b82f6;border-radius:18px;padding:16px 18px;cursor:pointer" style-hover="background:#18202f">
+          <div style="font-size:13px;font-weight:700;color:#93c5fd">Fixas ›</div>
           <div style="font-size:clamp(20px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin-top:6px">{{ somaFixa }}</div>
           <div style="font-size:12px;color:#8b97ad;margin-top:4px">todo mês, valor igual</div>
         </div>
-        <div style="background:#131926;border:1px solid #1f2937;border-left:3px solid #f59e0b;border-radius:18px;padding:16px 18px">
-          <div style="font-size:13px;font-weight:700;color:#fcd34d">Variáveis</div>
+        <div sc-camel-on-click="{{ verVariaveis }}" style="background:#131926;border:1px solid #1f2937;border-left:3px solid #f59e0b;border-radius:18px;padding:16px 18px;cursor:pointer" style-hover="background:#18202f">
+          <div style="font-size:13px;font-weight:700;color:#fcd34d">Variáveis ›</div>
           <div style="font-size:clamp(20px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin-top:6px">{{ somaVariavel }}</div>
           <div style="font-size:12px;color:#8b97ad;margin-top:4px">todo mês, valor muda</div>
         </div>
@@ -366,13 +376,13 @@
 
       <div style="font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b97ad;margin:22px 0 10px">Flexível · dá pra economizar</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-        <div style="background:#131926;border:1px solid #1f2937;border-left:3px solid #a855f7;border-radius:18px;padding:16px 18px">
-          <div style="font-size:13px;font-weight:700;color:#c084fc">Periódicas</div>
+        <div sc-camel-on-click="{{ verPeriodicas }}" style="background:#131926;border:1px solid #1f2937;border-left:3px solid #a855f7;border-radius:18px;padding:16px 18px;cursor:pointer" style-hover="background:#18202f">
+          <div style="font-size:13px;font-weight:700;color:#c084fc">Periódicas ›</div>
           <div style="font-size:clamp(20px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin-top:6px">{{ somaPeriodica }}</div>
           <div style="font-size:12px;color:#8b97ad;margin-top:4px">IPVA, IPTU, seguros</div>
         </div>
-        <div style="background:#131926;border:1px solid #1f2937;border-left:3px solid #94a3b8;border-radius:18px;padding:16px 18px">
-          <div style="font-size:13px;font-weight:700;color:#cbd5e1">Eventuais</div>
+        <div sc-camel-on-click="{{ verEventuais }}" style="background:#131926;border:1px solid #1f2937;border-left:3px solid #94a3b8;border-radius:18px;padding:16px 18px;cursor:pointer" style-hover="background:#18202f">
+          <div style="font-size:13px;font-weight:700;color:#cbd5e1">Eventuais ›</div>
           <div style="font-size:clamp(20px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin-top:6px">{{ somaEventual }}</div>
           <div style="font-size:12px;color:#8b97ad;margin-top:4px">consertos, imprevistos</div>
         </div>
@@ -392,7 +402,8 @@
             <span style="width:9px;height:9px;border-radius:99px;flex:none;background:{{ c.catCor }}"></span>
             <div style="flex:1;min-width:0">
               <div style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.titulo }}</div>
-              <div style="font-size:12.5px;color:#8b97ad;margin-top:3px">{{ c.dataFmt }} · {{ c.forma }}</div>
+              <div style="font-size:12.5px;color:#8b97ad;margin-top:3px">{{ c.catNome }} · {{ c.tipoNome }} · {{ c.forma }}</div>
+              <div style="font-size:12px;color:#6b7688;margin-top:2px">{{ c.dataFmt }}</div>
             </div>
             <div style="text-align:right;flex:none">
               <div style="font-weight:800;font-size:16px;letter-spacing:-.01em">{{ c.valorFmt }}</div>
@@ -547,7 +558,7 @@
     <div data-screen-label="Análise" style="animation:om-fade .25s ease">
       <div style="margin-bottom:18px">
         <div style="font-size:clamp(22px,4vw,28px);font-weight:800;letter-spacing:-.02em">Análise</div>
-        <div style="font-size:13.5px;color:#8b97ad;margin-top:4px">{{ mesLabel }} · {{ totalMes }} em contas</div>
+        <div style="font-size:13.5px;color:#8b97ad;margin-top:4px">{{ mesLabel }} · {{ totalMes }} em contas · toque numa linha pra ver as contas</div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px">
@@ -577,7 +588,7 @@
             </div>
             <div style="flex:1;min-width:150px;display:flex;flex-direction:column;gap:11px">
               <sc-for list="{{ porCategoria }}" as="s" hint-placeholder-count="3">
-                <div style="display:flex;align-items:center;gap:9px">
+                <div sc-camel-on-click="{{ s.ver }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:3px 0" style-hover="opacity:.75">
                   <span style="width:9px;height:9px;border-radius:99px;flex:none;background:{{ s.cor }}"></span>
                   <span style="font-size:13.5px;font-weight:600;color:#c8d3e4;flex:1">{{ s.nome }}</span>
                   <span style="font-size:13.5px;font-weight:800">{{ s.valorFmt }}</span>
@@ -601,7 +612,7 @@
             </div>
             <div style="flex:1;min-width:150px;display:flex;flex-direction:column;gap:11px">
               <sc-for list="{{ porTipo }}" as="s" hint-placeholder-count="4">
-                <div style="display:flex;align-items:center;gap:9px">
+                <div sc-camel-on-click="{{ s.ver }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:3px 0" style-hover="opacity:.75">
                   <span style="width:9px;height:9px;border-radius:99px;flex:none;background:{{ s.cor }}"></span>
                   <span style="font-size:13.5px;font-weight:600;color:#c8d3e4;flex:1">{{ s.nome }}</span>
                   <span style="font-size:13.5px;font-weight:800">{{ s.valorFmt }}</span>
@@ -643,10 +654,10 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;align-items:start">
 
         <div style="background:#131926;border:1px solid #1f2937;border-radius:20px;padding:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <div style="font-size:15.5px;font-weight:800">Categorias</div>
-            <button sc-camel-on-click="{{ novaCategoria }}" style="background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.35);color:#93c5fd;border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:rgba(59,130,246,.24)">+ Nova</button>
           </div>
+          <div style="font-size:12.5px;color:#8b97ad;margin-bottom:14px">As 3 categorias base são fixas (Pessoal, Casa, Empresa). Personalize com subcategorias dentro de cada uma.</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ categorias }}" as="cat" hint-placeholder-count="3">
               <div style="background:#0f1725;border:1px solid #1f2937;border-radius:16px;padding:14px">
@@ -658,7 +669,7 @@
                 </div>
                 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px">
                   <sc-for list="{{ cat.subs }}" as="s" hint-placeholder-count="3">
-                    <span style="font-size:12px;font-weight:600;color:#9fb0c9;background:#151d2c;border:1px solid #232d40;border-radius:99px;padding:5px 11px">{{ s.nome }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#9fb0c9;background:#151d2c;border:1px solid #232d40;border-radius:99px;padding:5px 11px">{{ s.nome }}<button sc-camel-on-click="{{ s.remover }}" style="background:none;border:none;color:#f87171;font-size:14px;line-height:1;cursor:pointer;padding:0;font-weight:800">×</button></span>
                   </sc-for>
                   <button sc-camel-on-click="{{ cat.novaSub }}" style="font-size:12px;font-weight:700;color:#60a5fa;background:none;border:1px dashed #2f4260;border-radius:99px;padding:5px 11px;cursor:pointer" style-hover="background:#152036">+ subcategoria</button>
                 </div>
@@ -787,12 +798,15 @@
         </div>
       </div>
 
-      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 5.3 · agosto/2026</div>
+      <div style="text-align:center;font-size:12.5px;color:#5f6c83;padding:26px 0 6px">Painel de Contas · versão 6.0 · agosto/2026</div>
     </div>
     </sc-if>
   </div>
 
   <sc-if value="{{ mostrarFab }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ fabAberto }}">
+      <div sc-camel-on-click="{{ fecharFab }}" style="position:fixed;inset:0;z-index:39;background:rgba(4,8,15,.55)"></div>
+    </sc-if>
     <div style="position:fixed;right:clamp(16px,4vw,34px);bottom:104px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px">
       <sc-if value="{{ fabAberto }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;animation:om-up .18s ease">
@@ -882,6 +896,17 @@
             </div>
           </div>
 
+          <sc-if value="{{ temSubs }}">
+          <div>
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad;margin-bottom:8px">Subcategoria de {{ catEscolhida }} <span style="color:#6b7688;font-weight:600;text-transform:none;letter-spacing:0">(opcional)</span></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ opSub }}" as="o">
+                <button sc-camel-on-click="{{ o.sel }}" style="border-radius:99px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;background:{{ o.bg }};color:{{ o.cor }};border:1px solid {{ o.bd }}">{{ o.nome }}</button>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
           <div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
               <div style="font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad">Tipo de despesa</div>
@@ -927,13 +952,33 @@
 
           <div sc-camel-on-click="{{ toggleRec }}" style="display:flex;align-items:center;gap:12px;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:15px;cursor:pointer">
             <div style="flex:1">
-              <div style="font-size:14.5px;font-weight:700">Repetir todo mês</div>
-              <div style="font-size:12.5px;color:#8b97ad;margin-top:2px">Cria automaticamente nos próximos meses</div>
+              <div style="font-size:14.5px;font-weight:700">Repetir</div>
+              <div style="font-size:12.5px;color:#8b97ad;margin-top:2px">Cria automaticamente no próximo período</div>
             </div>
             <span style="width:46px;height:27px;border-radius:99px;flex:none;padding:3px;display:flex;align-items:center;justify-content:{{ recJust }};background:{{ recTrilha }}">
               <span style="width:21px;height:21px;border-radius:99px;background:#fff"></span>
             </span>
           </div>
+
+          <sc-if value="{{ fRec }}">
+          <div>
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad;margin:2px 0 8px">Com que frequência</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ opRepetir }}" as="o">
+                <button sc-camel-on-click="{{ o.sel }}" style="flex:1;min-width:calc(50% - 4px);background:{{ o.bg }};color:{{ o.cor }};border:1px solid {{ o.bd }};border-radius:13px;padding:11px;font-size:13.5px;font-weight:700;cursor:pointer">{{ o.nome }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad;margin:2px 0 8px">Por quanto tempo</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ opDuracao }}" as="o">
+                <button sc-camel-on-click="{{ o.sel }}" style="flex:1;min-width:calc(33% - 6px);background:{{ o.bg }};color:{{ o.cor }};border:1px solid {{ o.bd }};border-radius:13px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">{{ o.nome }}</button>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;color:#6b7688;margin-top:7px">{{ duracaoExplica }}</div>
+          </div>
+          </sc-if>
 
           <div>
             <div style="font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad;margin-bottom:8px">Prioridade</div>
@@ -1027,6 +1072,14 @@
 
           <button sc-camel-on-click="{{ pagarSel }}" style="width:100%;border:none;border-radius:18px;padding:17px;font-size:15.5px;font-weight:800;cursor:pointer;background:{{ detBtnBg }};color:{{ detBtnCor }}">{{ detBtnTexto }}</button>
 
+          <div style="margin-top:9px">
+            <div style="font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8b97ad;margin-bottom:8px">Copiar esta conta para outro mês</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+              <button sc-camel-on-click="{{ duplicarTras }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:14px;color:#c8d3e4;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#1c2637">‹ Mês anterior</button>
+              <button sc-camel-on-click="{{ duplicarFrente }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:14px;color:#c8d3e4;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#1c2637">Próximo mês ›</button>
+            </div>
+          </div>
+
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px">
             <button sc-camel-on-click="{{ agendaGoogle }}" style="display:flex;align-items:center;justify-content:center;gap:9px;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:15px;color:#c8d3e4;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#1c2637">
               <svg width="17" height="17" sc-camel-view-box="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16V20H4z"></path><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 11h16"></path></svg>
@@ -1037,6 +1090,21 @@
               Excluir
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ overlayExcluirSerie }}">
+    <div style="position:fixed;inset:0;z-index:70;background:rgba(4,7,13,.72);display:flex;align-items:flex-end;justify-content:center;animation:om-fade .18s ease">
+      <div style="width:100%;max-width:520px;background:#0f1523;border:1px solid #232d40;border-top-left-radius:26px;border-top-right-radius:26px;padding:22px clamp(16px,4vw,26px) calc(22px + env(safe-area-inset-bottom));animation:om-up .22s ease">
+        <div style="font-size:18px;font-weight:800;margin-bottom:6px">Excluir conta recorrente</div>
+        <div style="font-size:13.5px;color:#8b97ad;margin-bottom:18px">Esta conta se repete. O que você quer excluir?</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button sc-camel-on-click="{{ excluirEste }}" style="width:100%;text-align:left;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:15px;color:#e8edf7;font-size:14.5px;font-weight:700;cursor:pointer" style-hover="background:#1c2637">Somente este evento</button>
+          <button sc-camel-on-click="{{ excluirProximos }}" style="width:100%;text-align:left;background:#151d2c;border:1px solid #232d40;border-radius:16px;padding:15px;color:#e8edf7;font-size:14.5px;font-weight:700;cursor:pointer" style-hover="background:#1c2637">Este e os próximos</button>
+          <button sc-camel-on-click="{{ excluirTodos }}" style="width:100%;text-align:left;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:16px;padding:15px;color:#fca5a5;font-size:14.5px;font-weight:700;cursor:pointer" style-hover="background:rgba(239,68,68,.18)">Todos da série</button>
+          <button sc-camel-on-click="{{ cancelarExcluir }}" style="width:100%;background:none;border:none;color:#8b97ad;font-size:14px;font-weight:700;cursor:pointer;padding:10px">Cancelar</button>
         </div>
       </div>
     </div>
@@ -1360,6 +1428,7 @@ class DCLogic {
     salvarNoAparelho({
       contas: s.contas,
       cats: s.cats,
+      bancos: s.bancos,
       aviso: s.aviso,
       hora: s.hora,
       tg: s.tg,
@@ -1446,7 +1515,8 @@ class Component extends DCLogic {
       hora: salvo && salvo.hora ? salvo.hora : '09:00',
       tg: salvo && salvo.tg ? salvo.tg : { push: true, resumo: true, atraso: true },
       contas: salvo && salvo.contas ? salvo.contas : [],
-      cats: salvo && salvo.cats ? salvo.cats : JSON.parse(JSON.stringify(this.CAT))
+      cats: salvo && salvo.cats ? salvo.cats : JSON.parse(JSON.stringify(this.CAT)),
+      bancos: salvo && salvo.bancos ? salvo.bancos : []
     };
   })();
 
@@ -1482,7 +1552,8 @@ class Component extends DCLogic {
     return {
       id: c.id, titulo: c.titulo, valorFmt: this.fmt(c.valor), dataFmt: this.dataFmt(c.venc),
       quando: this.quando(c), sitCor: this.sitCor(c), forma: c.forma, banco: c.banco || '—',
-      catCor: this.cCat(c.cat).cor, tipoNome: t.nome, tipoCor: t.cor, tipoBg: t.bg,
+      catCor: this.cCat(c.cat).cor, catNome: this.cCat(c.cat).nome, tipoNome: t.nome, tipoCor: t.cor, tipoBg: t.bg,
+      sub: c.sub || '', catCompleta: c.sub ? (this.cCat(c.cat).nome + ' › ' + c.sub) : this.cCat(c.cat).nome,
       risco: pago ? 'line-through' : 'none', tituloCor: pago ? '#7e8aa0' : '#e8edf7',
       checkBg: pago ? '#22c55e' : 'transparent', checkBd: pago ? '#22c55e' : '#2f3b52', checkIcon: pago ? '#052e18' : '#2f3b52',
       abrir: () => this.setState({ overlay: 'det', sel: c.id, fab: false }),
@@ -1496,14 +1567,48 @@ class Component extends DCLogic {
 
   togglePago(id) {
     const c = this.state.contas.find(x => x.id === id);
-    this.setState({ contas: this.state.contas.map(x => x.id === id ? Object.assign({}, x, { pago: !x.pago }) : x) });
-    this.aviso(c && c.pago ? 'Marcada como não paga' : 'Pagamento registrado ✓');
+    if (!c) return;
+    const vaipagar = !c.pago;
+    let novas = this.state.contas.map(x => x.id === id ? Object.assign({}, x, { pago: vaipagar }) : x);
+    // Se marcou PAGA uma conta recorrente, cria automaticamente a do próximo período
+    // (mês/semana/quinzena/ano) — em aberto, mesmo valor como previsão.
+    if (vaipagar && c.rec) {
+      const seq = (c.seq || 1);
+      const limite = c.vezes || 0; // 0 = sempre
+      // só cria a próxima se ainda não atingiu o limite de repetições
+      if (limite === 0 || seq < limite) {
+        const prox = this._proximaData(c.venc, c.repetir || 'mensal');
+        const jaExiste = this.state.contas.some(x => x.serie === c.serie && x.venc === prox);
+        if (!jaExiste) {
+          novas = novas.concat([Object.assign({}, c, { id: 'r' + Date.now(), venc: prox, pago: false, seq: seq + 1 })]);
+        }
+      }
+    }
+    this.setState({ contas: novas });
+    this.aviso(c.pago ? 'Marcada como não paga' : 'Pagamento registrado ✓');
+  }
+  // Calcula a próxima data conforme a frequência.
+  _proximaData(venc, repetir) {
+    const d = new Date(venc + 'T12:00:00');
+    if (repetir === 'semanal') d.setDate(d.getDate() + 7);
+    else if (repetir === 'quinzenal') d.setDate(d.getDate() + 15);
+    else if (repetir === 'anual') d.setFullYear(d.getFullYear() + 1);
+    else d.setMonth(d.getMonth() + 1); // mensal (padrão)
+    return d.toISOString().slice(0, 10);
   }
   aviso(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2200); }
   novoForm(extra) {
-    return Object.assign({ titulo: '', desc: '', valor: '', venc: '2026-08-15', cat: 'pessoal', tipo: '', forma: 'Pix', banco: '', cartao: '', rec: true, prio: 2 }, extra || {});
+    return Object.assign({ titulo: '', desc: '', valor: '', venc: '2026-08-15', cat: 'pessoal', sub: '', tipo: '', forma: 'Pix', banco: '', cartao: '', rec: true, repetir: 'mensal', prio: 2 }, extra || {});
   }
-  setF(k) { return (e) => this.setState({ form: Object.assign({}, this.state.form, { [k]: e.target.value }) }); }
+  setF(k) {
+    return (e) => {
+      // Atualiza o valor do formulário SEM re-renderizar a tela — senão o
+      // campo é recriado a cada tecla e o teclado perde o foco (some).
+      if (this.state.form) this.state.form[k] = e.target.value;
+      // persiste em silêncio, sem mexer no DOM do input que está em uso
+      this._persistir();
+    };
+  }
   pill(ativo, cor) {
     return ativo
       ? { bg: cor, cor: '#08121f', bd: cor }
@@ -1515,7 +1620,9 @@ class Component extends DCLogic {
     if (!f.tipo) return this.setState({ erro: 'Escolha o tipo de despesa — é obrigatório.' });
     const valor = Number(String(f.valor).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
     if (!valor) return this.setState({ erro: 'Informe o valor da conta.' });
-    const nova = { id: f.id || 'n' + Date.now(), titulo: f.titulo, desc: f.desc, valor: valor, venc: f.venc, cat: f.cat, tipo: f.tipo, forma: f.forma, banco: f.banco, cartao: f.cartao, prio: f.prio, rec: f.rec, pago: f.pago || false };
+    const nova = { id: f.id || 'n' + Date.now(), titulo: f.titulo, desc: f.desc, valor: valor, venc: f.venc, cat: f.cat, sub: f.sub || '', tipo: f.tipo, forma: f.forma, banco: f.banco, cartao: f.cartao, prio: f.prio, rec: f.rec, repetir: f.repetir || 'mensal', vezes: f.vezes || 0, serie: f.serie || ('s' + Date.now()), seq: f.seq || 1, pago: f.pago || false };
+    // guarda banco novo pra reutilizar depois
+    if (f.banco && f.banco.trim()) this._addBanco(f.banco, f.cartao);
     const existe = this.state.contas.some(c => c.id === nova.id);
     this.setState({
       contas: existe ? this.state.contas.map(c => c.id === nova.id ? nova : c) : this.state.contas.concat([nova]),
@@ -1693,6 +1800,88 @@ class Component extends DCLogic {
     const m = { pix: 'Pix', boleto: 'Boleto', credito: 'Cartão', debito: 'Débito automático', dinheiro: 'Dinheiro', carteira: 'Dinheiro' };
     return m[f] || 'Pix';
   }
+  // Adiciona um banco/instituição à lista salva (se ainda não existe).
+  _addBanco(nome, cartao) {
+    nome = (nome || '').trim();
+    if (!nome) return;
+    const existe = this.state.bancos.some((b) => b.nome.toLowerCase() === nome.toLowerCase() && (b.cartao || '') === (cartao || ''));
+    if (existe) return;
+    const cores = ['#c084fc', '#fbbf24', '#93c5fd', '#4ade80', '#fca5a5', '#f472b6', '#38bdf8'];
+    const cor = cores[this.state.bancos.length % cores.length];
+    const novo = { id: 'b' + Date.now(), nome: nome, cartao: (cartao || '').trim(), cor: cor };
+    this.setState({ bancos: this.state.bancos.concat([novo]) });
+  }
+  _removerBanco(id) {
+    this.setState({ bancos: this.state.bancos.filter((b) => b.id !== id) });
+    this.aviso('Removido');
+  }
+  _pedirBanco() {
+    const nome = window.prompt('Nome do banco ou instituição (ex: Nubank, Mercado Pago):');
+    if (!nome || !nome.trim()) return;
+    const cartao = window.prompt('Final do cartão (4 dígitos) — opcional, deixe vazio se não for cartão:') || '';
+    this._addBanco(nome, cartao.trim());
+    this.aviso(nome.trim() + ' salvo ✓');
+  }
+  // Sigla de 2 letras pro ícone do banco
+  _sigla(nome) {
+    const p = (nome || '').trim().split(/\s+/);
+    if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase();
+    return (nome || '??').slice(0, 2).toUpperCase();
+  }
+  // Duplica uma conta N meses pra frente (1) ou pra trás (-1), em aberto.
+  _duplicarConta(conta, direcao) {
+    const d = new Date(conta.venc + 'T12:00:00');
+    d.setMonth(d.getMonth() + direcao);
+    const novoVenc = d.toISOString().slice(0, 10);
+    const copia = Object.assign({}, conta, { id: 'd' + Date.now(), venc: novoVenc, pago: false });
+    this.setState({
+      contas: this.state.contas.concat([copia]),
+      overlay: null, sel: null, mes: novoVenc.slice(0, 7),
+    });
+    const nomeMes = this.MES[d.getMonth()];
+    this.aviso('Copiada para ' + nomeMes + ' ✓');
+  }
+  _renomearCat(k) {
+    const atual = this.cCat(k).nome;
+    const novo = window.prompt('Novo nome para a categoria:', atual);
+    if (!novo || !novo.trim()) return;
+    const cats = JSON.parse(JSON.stringify(this.state.cats));
+    cats[k].nome = novo.trim();
+    this.setState({ cats: cats });
+    this.aviso('Renomeada ✓');
+  }
+  _novaSub(k) {
+    const nome = window.prompt('Nome da nova subcategoria em ' + this.cCat(k).nome + ':');
+    if (!nome || !nome.trim()) return;
+    const cats = JSON.parse(JSON.stringify(this.state.cats));
+    if (!cats[k].subs) cats[k].subs = [];
+    if (cats[k].subs.indexOf(nome.trim()) < 0) cats[k].subs.push(nome.trim());
+    this.setState({ cats: cats });
+    this.aviso('Subcategoria criada ✓');
+  }
+  _removerSub(k, nome) {
+    const cats = JSON.parse(JSON.stringify(this.state.cats));
+    cats[k].subs = (cats[k].subs || []).filter(x => x !== nome);
+    this.setState({ cats: cats });
+    this.aviso('Removida');
+  }
+  // Abre o Google Agenda pra criar um evento de lembrete no dia do vencimento.
+  _googleAgenda(c) {
+    const d = c.venc.replace(/-/g, '');
+    const prox = new Date(c.venc + 'T12:00:00');
+    prox.setDate(prox.getDate() + 1);
+    const dfim = prox.toISOString().slice(0, 10).replace(/-/g, '');
+    const titulo = encodeURIComponent('Pagar: ' + c.titulo + ' (' + this.fmt(c.valor) + ')');
+    const det = encodeURIComponent(
+      'Conta: ' + c.titulo + '\nValor: ' + this.fmt(c.valor) +
+      '\nCategoria: ' + this.cCat(c.cat).nome + (c.sub ? (' › ' + c.sub) : '') +
+      '\nForma: ' + c.forma + (c.banco ? ('\nBanco: ' + c.banco) : '')
+    );
+    const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + titulo +
+      '&dates=' + d + '/' + dfim + '&details=' + det;
+    try { window.open(url, '_blank'); this.aviso('Abrindo Google Agenda…'); }
+    catch (e) { this.aviso('Não consegui abrir o Google Agenda'); }
+  }
   _saudacao() {
     const h = new Date().getHours();
     const parte = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
@@ -1708,7 +1897,10 @@ class Component extends DCLogic {
     const s = this.state, tab = s.tab;
     const _h = this.hoje;
     const mesAtual = _h.getFullYear() + '-' + String(_h.getMonth() + 1).padStart(2, '0');
-    const doMesAtual = this.doMes(mesAtual);
+    // Escopo da home: 'tudo' ou uma categoria (pessoal/casa/empresa).
+    const escopo = s.escopoHome || 'tudo';
+    const doMesAtualTudo = this.doMes(mesAtual);
+    const doMesAtual = escopo === 'tudo' ? doMesAtualTudo : doMesAtualTudo.filter(c => c.cat === escopo);
     const pendentes = doMesAtual.filter(c => !c.pago);
     const totalMes = this.soma(doMesAtual);
     const pagoV = this.soma(doMesAtual.filter(c => c.pago));
@@ -1764,11 +1956,13 @@ class Component extends DCLogic {
     };
     const porCategoria = ['pessoal', 'casa', 'empresa'].map(k => {
       const v = this.soma(doSel.filter(c => c.cat === k));
-      return { nome: this.cCat(k).nome, cor: this.cCat(k).cor, valor: v, valorFmt: this.curto(v), pct: totalSel ? Math.round(v / totalSel * 100) : 0 };
+      return { nome: this.cCat(k).nome, cor: this.cCat(k).cor, valor: v, valorFmt: this.curto(v), pct: totalSel ? Math.round(v / totalSel * 100) : 0,
+        ver: () => this.setState({ tab: 'contas', cat: k, tipo: 'todas', sit: 'todas' }) };
     });
     const porTipo = ['fixa', 'variavel', 'periodica', 'eventual'].map(k => {
       const v = this.somaTipo(doSel, k);
-      return { nome: this.TIPO[k].nome, cor: this.TIPO[k].dot, valor: v, valorFmt: this.curto(v), pct: totalSel ? Math.round(v / totalSel * 100) : 0 };
+      return { nome: this.TIPO[k].nome, cor: this.TIPO[k].dot, valor: v, valorFmt: this.curto(v), pct: totalSel ? Math.round(v / totalSel * 100) : 0,
+        ver: () => this.setState({ tab: 'contas', tipo: k, cat: 'todas', sit: 'todas' }) };
     });
     const evoBase = [];
     for (let k = 5; k >= 0; k--) {
@@ -1810,7 +2004,20 @@ class Component extends DCLogic {
       alertaTitulo: hojeC.length ? hojeC.length + (hojeC.length === 1 ? ' conta vence hoje' : ' contas vencem hoje') : atrasadas.length + ' conta(s) atrasada(s)',
       alertaSub: (atrasadas.length ? atrasadas.length + ' atrasada(s) · ' : '') + 'toque para resolver agora',
       verAtencao: () => this.setState({ tab: 'contas', sit: 'atrasada', cat: 'todas', tipo: 'todas', mes: mesAtual }),
-      proximos: pendentes.filter(c => this.dias(c.venc) >= 0).sort((a, b) => a.venc.localeCompare(b.venc)).slice(0, 4).map(c => this.view(c)),
+      proximos: pendentes.filter(c => this.dias(c.venc) >= 0).sort((a, b) => a.venc.localeCompare(b.venc)).slice(0, 6).map(c => this.view(c)),
+
+      // Escopo do total (tudo / pessoal / casa / empresa) — clicável e expansível
+      escopoNome: escopo === 'tudo' ? 'tudo' : this.cCat(escopo).nome,
+      escopoSeta: s.escopoAberto ? '▲' : '▼',
+      escopoAberto: !!s.escopoAberto,
+      toggleEscopo: () => this.setState({ escopoAberto: !s.escopoAberto }),
+      escopos: [['tudo', 'Tudo'], ['pessoal', this.cCat('pessoal').nome], ['casa', this.cCat('casa').nome], ['empresa', this.cCat('empresa').nome]].map(x =>
+        Object.assign({ nome: x[1], sel: () => this.setState({ escopoHome: x[0], escopoAberto: false }) }, this.pill(escopo === x[0], this.accent))),
+      // Cards de tipo levam pra Contas filtradas por aquele tipo
+      verFixas: () => this.setState({ tab: 'contas', tipo: 'fixa', sit: 'todas', cat: escopo === 'tudo' ? 'todas' : escopo, mes: mesAtual }),
+      verVariaveis: () => this.setState({ tab: 'contas', tipo: 'variavel', sit: 'todas', cat: escopo === 'tudo' ? 'todas' : escopo, mes: mesAtual }),
+      verPeriodicas: () => this.setState({ tab: 'contas', tipo: 'periodica', sit: 'todas', cat: escopo === 'tudo' ? 'todas' : escopo, mes: mesAtual }),
+      verEventuais: () => this.setState({ tab: 'contas', tipo: 'eventual', sit: 'todas', cat: escopo === 'tudo' ? 'todas' : escopo, mes: mesAtual }),
 
       mesLabel: mesLabel, qtdMes: doSel.length,
       faltaMes: this.fmt(this.soma(doSel.filter(c => !c.pago))), pagoMes: this.fmt(this.soma(doSel.filter(c => c.pago))),
@@ -1835,23 +2042,21 @@ class Component extends DCLogic {
 
       categorias: ['pessoal', 'casa', 'empresa'].map(k => ({
         nome: this.cCat(k).nome, cor: this.cCat(k).cor,
-        subs: this.cCat(k).subs.map(n => ({ nome: n })),
+        subs: this.cCat(k).subs.map(n => ({ nome: n, remover: () => this._removerSub(k, n) })),
         paleta: ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7', '#ec4899', '#14b8a6'].map(cor => ({
           cor: cor, bd: this.cCat(k).cor === cor ? '#e8edf7' : 'transparent',
           sel: () => { const cats = JSON.parse(JSON.stringify(s.cats)); cats[k].cor = cor; this.setState({ cats: cats }); this.aviso('Cor de ' + cats[k].nome + ' atualizada'); }
         })),
-        renomear: () => this.aviso('Renomear ' + this.cCat(k).nome),
-        excluir: () => this.aviso('Categoria em uso por contas ativas'),
-        novaSub: () => this.aviso('Nova subcategoria em ' + this.cCat(k).nome)
+        renomear: () => this._renomearCat(k),
+        novaSub: () => this._novaSub(k)
       })),
       tiposInfo: ['fixa', 'variavel', 'periodica', 'eventual'].map(k => ({ nome: this.TIPO[k].nome, cor: this.TIPO[k].dot, desc: this.TIPO[k].desc, ex: this.TIPO[k].ex })),
-      bancos: [
-        { sigla: 'NU', nome: 'Nubank', detalhe: 'Cartão Platinum · fecha dia 03', bg: 'rgba(168,85,247,.16)', cor: '#c084fc' },
-        { sigla: 'IT', nome: 'Itaú', detalhe: 'Conta corrente · débito automático', bg: 'rgba(245,158,11,.16)', cor: '#fbbf24' },
-        { sigla: 'BB', nome: 'Banco do Brasil', detalhe: 'Conta da empresa · Pix e boletos', bg: 'rgba(59,130,246,.16)', cor: '#93c5fd' },
-        { sigla: 'CX', nome: 'Caixa', detalhe: 'Boletos de consumo', bg: 'rgba(34,197,94,.16)', cor: '#4ade80' },
-        { sigla: 'BR', nome: 'Bradesco Elo', detalhe: 'Cartão · fecha dia 20', bg: 'rgba(239,68,68,.16)', cor: '#fca5a5' }
-      ].map(b => Object.assign(b, { editar: () => this.aviso('Editar ' + b.nome) })),
+      bancos: this.state.bancos.map((b) => ({
+        id: b.id, sigla: this._sigla(b.nome), nome: b.nome,
+        detalhe: b.cartao ? ('Cartão final ' + b.cartao) : 'Instituição / conta',
+        bg: 'rgba(59,130,246,.16)', cor: b.cor || '#93c5fd',
+        editar: () => this._removerBanco(b.id),
+      })),
       opcoesAviso: [['No dia', 0], ['1 dia antes', 1], ['3 dias antes', 3], ['5 dias antes', 5], ['7 dias antes', 7]]
         .map(x => Object.assign({ nome: x[0], sel: () => { this.setState({ aviso: x[1] }); this.aviso('Aviso ' + x[0].toLowerCase()); } }, this.pill((this.props.diasAviso ?? s.aviso) === x[1], this.accent))),
       horarios: ['08:00', '09:00', '20:00'].map(h => Object.assign({ nome: h, sel: () => { this.setState({ hora: h }); this.aviso('Aviso às ' + h); } }, this.pill(s.hora === h, '#f59e0b'))),
@@ -1867,10 +2072,11 @@ class Component extends DCLogic {
       backupBaixar: () => this._baixarBackup(),
       backupResgatar: () => this._importarBackup(),
       novaCategoria: () => this.aviso('Nova categoria'),
-      novoBanco: () => this.aviso('Adicionar banco ou cartão'),
+      novoBanco: () => this._pedirBanco(),
 
       mostrarFab: !s.overlay, fabAberto: s.fab, fabGiro: s.fab ? 45 : 0,
       toggleFab: () => this.setState({ fab: !s.fab }),
+      fecharFab: () => this.setState({ fab: false }),
       acoesFab: [
         { nome: 'Uma conta', cor: '#3b82f6', acao: () => this.setState({ fab: false, overlay: 'form', erro: '', form: this.novoForm() }) },
         { nome: 'Várias de uma vez', cor: '#f59e0b', acao: () => { this.setState({ fab: false }); this.aviso('Cadastro em lote: 1 linha por conta'); } },
@@ -1886,8 +2092,14 @@ class Component extends DCLogic {
       setBanco: this.setF('banco'), setCartao: this.setF('cartao'), setDesc: this.setF('desc'),
       opCat: ['pessoal', 'casa', 'empresa'].map(k => Object.assign({
         nome: this.cCat(k).nome, dot: f.cat === k ? '#08121f' : this.cCat(k).cor,
-        sel: () => this.setState({ form: Object.assign({}, f, { cat: k }) })
+        sel: () => this.setState({ form: Object.assign({}, f, { cat: k, sub: '' }) })
       }, this.pill(f.cat === k, this.cCat(k).cor))),
+      temSubs: (this.cCat(f.cat).subs || []).length > 0,
+      catEscolhida: this.cCat(f.cat).nome,
+      opSub: (this.cCat(f.cat).subs || []).map(nome => Object.assign({
+        nome: nome,
+        sel: () => this.setState({ form: Object.assign({}, f, { sub: f.sub === nome ? '' : nome }) })
+      }, this.pill(f.sub === nome, this.accent))),
       opTipo: ['fixa', 'variavel', 'periodica', 'eventual'].map(k => {
         const at = f.tipo === k, t = this.TIPO[k];
         return { nome: t.nome, desc: t.desc, dot: t.dot, cor: at ? t.cor : '#c8d3e4', bg: at ? t.bg : '#151d2c', bd: at ? t.dot : '#232d40', sel: () => this.setState({ form: Object.assign({}, f, { tipo: k }), erro: '' }) };
@@ -1896,6 +2108,14 @@ class Component extends DCLogic {
       opPrio: [['Alta', 1], ['Normal', 2], ['Baixa', 3]].map(x => Object.assign({ nome: x[0], sel: () => this.setState({ form: Object.assign({}, f, { prio: x[1] }) }) }, this.pill(f.prio === x[1], x[1] === 1 ? '#f59e0b' : this.accent))),
       toggleRec: () => this.setState({ form: Object.assign({}, f, { rec: !f.rec }) }),
       recJust: f.rec ? 'flex-end' : 'flex-start', recTrilha: f.rec ? this.accent : '#2b3648',
+      fRec: !!f.rec,
+      opRepetir: [['Mensal', 'mensal'], ['Semanal', 'semanal'], ['Quinzenal', 'quinzenal'], ['Anual', 'anual']].map(x =>
+        Object.assign({ nome: x[0], sel: () => this.setState({ form: Object.assign({}, f, { repetir: x[1] }) }) }, this.pill((f.repetir || 'mensal') === x[1], this.accent))),
+      opDuracao: [['Sempre', 0], ['6×', 6], ['12×', 12], ['24×', 24], ['48×', 48]].map(x =>
+        Object.assign({ nome: x[0], sel: () => this.setState({ form: Object.assign({}, f, { vezes: x[1] }) }) }, this.pill((f.vezes || 0) === x[1], this.accent))),
+      duracaoExplica: (f.vezes && f.vezes > 0)
+        ? ('Cria ' + f.vezes + ' vezes e depois para automaticamente.')
+        : 'Repete pra sempre, até você excluir a série.',
       salvar: () => this.salvar(), formErro: !!s.erro, formErroTexto: s.erro,
 
       abrirSugestoes: () => this.setState({ sugOpen: true, form: s.form || this.novoForm() }),
@@ -1932,8 +2152,29 @@ class Component extends DCLogic {
       detBtnCor: sel && sel.pago ? '#c8d3e4' : '#052e18',
       pagarSel: () => { if (sel) { this.togglePago(sel.id); this.setState({ overlay: null, sel: null }); } },
       editarSel: () => sel && this.setState({ overlay: 'form', erro: '', form: Object.assign({}, sel) }),
-      excluirSel: () => { if (sel) { this.setState({ contas: s.contas.filter(c => c.id !== sel.id), overlay: null, sel: null }); this.aviso('Conta excluída'); } },
-      agendaGoogle: () => this.aviso('Evento criado no Google Agenda'),
+      excluirSel: () => {
+        if (!sel) return;
+        const temSerie = sel.rec && s.contas.filter(c => c.serie === sel.serie).length > 1;
+        if (temSerie) { this.setState({ overlay: 'excluirSerie' }); }
+        else { this.setState({ contas: s.contas.filter(c => c.id !== sel.id), overlay: null, sel: null }); this.aviso('Conta excluída'); }
+      },
+      excluirEste: () => { if (sel) { this.setState({ contas: s.contas.filter(c => c.id !== sel.id), overlay: null, sel: null }); this.aviso('Este evento excluído'); } },
+      excluirProximos: () => {
+        if (!sel) return;
+        this.setState({ contas: s.contas.filter(c => !(c.serie === sel.serie && c.venc >= sel.venc)), overlay: null, sel: null });
+        this.aviso('Este e os próximos excluídos');
+      },
+      excluirTodos: () => {
+        if (!sel) return;
+        this.setState({ contas: s.contas.filter(c => c.serie !== sel.serie), overlay: null, sel: null });
+        this.aviso('Série inteira excluída');
+      },
+      cancelarExcluir: () => this.setState({ overlay: 'det' }),
+      overlayExcluirSerie: s.overlay === 'excluirSerie',
+      agendaGoogle: () => { if (sel) this._googleAgenda(sel); },
+      // Duplicar a conta pro mês seguinte ou anterior (em aberto), sem redigitar.
+      duplicarFrente: () => { if (sel) this._duplicarConta(sel, 1); },
+      duplicarTras: () => { if (sel) this._duplicarConta(sel, -1); },
 
       abrirImportar: () => this.setState({ overlay: 'imp' }),
       modosImp: [['Contas de planilha', 'planilha'], ['Conferir por extrato', 'extrato']].map(x => ({
